@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symetra Organizational Chart</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        
+        .summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .summary h2 {
+            color: #495057;
+            margin-bottom: 15px;
+        }
+        
+        .summary p {
+            color: #6c757d;
+            line-height: 1.6;
+        }
+        
+        .org-level {
+            margin-bottom: 40px;
+        }
+        
+        .level-title {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .employees-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .employee-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .employee-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .employee-name {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .employee-title {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .c-suite .employee-card {
+            border-color: #dc3545;
+            background: linear-gradient(135deg, #fff5f5, #ffe6e6);
+        }
+        
+        .senior-vp .employee-card {
+            border-color: #fd7e14;
+            background: linear-gradient(135deg, #fff8f0, #ffe8d6);
+        }
+        
+        .vp .employee-card {
+            border-color: #ffc107;
+            background: linear-gradient(135deg, #fffdf0, #fff8d6);
+        }
+        
+        .director .employee-card {
+            border-color: #20c997;
+            background: linear-gradient(135deg, #f0fffd, #d6fff8);
+        }
+        
+        .senior-manager .employee-card {
+            border-color: #6f42c1;
+            background: linear-gradient(135deg, #f8f0ff, #e8d6ff);
+        }
+        
+        .manager .employee-card {
+            border-color: #17a2b8;
+            background: linear-gradient(135deg, #f0f8ff, #d6e8ff);
+        }
+        
+        .department-analysis {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .department-analysis h2 {
+            color: #495057;
+            margin-bottom: 15px;
+        }
+        
+        .department-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .department-item {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .department-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .department-count {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Symetra Organizational Chart</h1>
+        
+        <div class="summary">
+            <h2>Current Symetra Employees Analysis</h2>
+            <p><strong>Total Current Employees:</strong> 77</p>
+            <p><strong>Key Findings:</strong></p>
+            <ul>
+                <li><strong>C-Suite Executives:</strong> 21 identified (including Directors and VPs)</li>
+                <li><strong>Senior Vice Presidents:</strong> 2 identified</li>
+                <li><strong>Chief Information Security Officer:</strong> Jamal Bodey-Burks</li>
+                <li><strong>Head of Engineering:</strong> Jack Wood (Senior VP)</li>
+            </ul>
+        </div>
+        
+        <div class="org-level c-suite">
+            <div class="level-title">C-Suite & Senior Leadership</div>
+            <div class="employees-grid">
+                <div class="employee-card">
+                    <div class="employee-name">Jamal Bodey-Burks</div>
+                    <div class="employee-title">Chief Information Security Officer & Assistant VP, Information Security</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Jack Wood</div>
+                    <div class="employee-title">Senior VP (Head of Engineering)</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Kevin Rabin</div>
+                    <div class="employee-title">Senior VP, Retirement Products</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Chris Lalonde</div>
+                    <div class="employee-title">Senior Vice President, Life Division and Emerging Solutions. President, Symetra Bermuda Re</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Jay Orum</div>
+                    <div class="employee-title">Senior Vice President, Information Technology and Chief Operations Office</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Andrew Farrell</div>
+                    <div class="employee-title">Senior Vice President and National Sales Manager and Head of Relationship Management At Symetra Financial</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="org-level vp">
+            <div class="level-title">Vice Presidents & Assistant VPs</div>
+            <div class="employees-grid">
+                <div class="employee-card">
+                    <div class="employee-name">Kelley Kelly</div>
+                    <div class="employee-title">Vice President, National Relationship Management</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Chad Ross</div>
+                    <div class="employee-title">Assistant VP, Strategic Solutions</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Derek Reading</div>
+                    <div class="employee-title">Assistant VP, Life Information Technology</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Joelle Conley</div>
+                    <div class="employee-title">Assistant VP, Securities Product Administration</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Sean Cox</div>
+                    <div class="employee-title">Assistant VP, Strategy</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">rainya helbraun</div>
+                    <div class="employee-title">Assistant VP, Life Information Technology</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="org-level director">
+            <div class="level-title">Directors</div>
+            <div class="employees-grid">
+                <div class="employee-card">
+                    <div class="employee-name">Advait Sathe</div>
+                    <div class="employee-title">Director, Engineering</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Charles Liptaak</div>
+                    <div class="employee-title">Director, Engineering</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Charles Sostak</div>
+                    <div class="employee-title">Director, Data Analytics</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Chris Kunz</div>
+                    <div class="employee-title">Director, Data Analytics</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Christian Wilhite</div>
+                    <div class="employee-title">Director, Engineering</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Edwin Chong</div>
+                    <div class="employee-title">Certified Scrum Product Owner & Director, Contract Automation, Content & Forms</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Karina Larson</div>
+                    <div class="employee-title">Director, Change Leadership</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Kayle Corey</div>
+                    <div class="employee-title">Director, Engineering</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Kimberly Youngman</div>
+                    <div class="employee-title">Sales Analytics Director, Product Delivery</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Leah Ihnen</div>
+                    <div class="employee-title">Director, Pfml & Absence Product Delivery</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Mitch Miller</div>
+                    <div class="employee-title">Director, Engineering</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Patricia Williams</div>
+                    <div class="employee-title">Director, Information Technology Risk Management</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Phyllis Sweeney</div>
+                    <div class="employee-title">Program Management Director, Information Technology</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Priyanka Shahheydari</div>
+                    <div class="employee-title">Director, Engineering</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Sai Ramanath</div>
+                    <div class="employee-title">Director, Engineering</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Sara Gorsuch</div>
+                    <div class="employee-title">Director, Digital Enablement</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="org-level senior-manager">
+            <div class="level-title">Senior Managers</div>
+            <div class="employees-grid">
+                <div class="employee-card">
+                    <div class="employee-name">Janna Bartolina</div>
+                    <div class="employee-title">Senior Manager, Implementation</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Kaley Donnelly</div>
+                    <div class="employee-title">Senior Manager, Information Technology</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Nagu Reddy</div>
+                    <div class="employee-title">Senior Manager, Enterprise Data Management</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Paul Emmett</div>
+                    <div class="employee-title">Senior Manager, Information Technology</div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-name">Whitney Mayoras</div>
+                    <div class="employee-title">Senior Manager, Quality Assurance</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="department-analysis">
+            <h2>Department Analysis</h2>
+            <div class="department-grid">
+                <div class="department-item">
+                    <div class="department-name">Information Technology</div>
+                    <div class="department-count">12 employees</div>
+                </div>
+                <div class="department-item">
+                    <div class="department-name">HR / Financial / ERP Systems</div>
+                    <div class="department-count">10 employees</div>
+                </div>
+                <div class="department-item">
+                    <div class="department-name">Product Management</div>
+                    <div class="department-count">9 employees</div>
+                </div>
+                <div class="department-item">
+                    <div class="department-name">Engineering & Technical</div>
+                    <div class="department-count">8 employees</div>
+                </div>
+                <div class="department-item">
+                    <div class="department-name">Application Development</div>
+                    <div class="department-count">6 employees</div>
+                </div>
+                <div class="department-item">
+                    <div class="department-name">Project Management</div>
+                    <div class="department-count">4 employees</div>
+                </div>
+                <div class="department-item">
+                    <div class="department-name">Project & Program Management</div>
+                    <div class="department-count">4 employees</div>
+                </div>
+                <div class="department-item">
+                    <div class="department-name">Business Intelligence</div>
+                    <div class="department-count">3 employees</div>
+                </div>
+                <div class="department-item">
+                    <div class="department-name">IT Operations</div>
+                    <div class="department-count">3 employees</div>
+                </div>
+                <div class="department-item">
+                    <div class="department-name">Data Warehouse</div>
+                    <div class="department-count">2 employees</div>
+                </div>
+                <div class="department-item">
+                    <div class="department-name">Product Development</div>
+                    <div class="department-count">2 employees</div>
+                </div>
+                <div class="department-item">
+                    <div class="department-name">Information Security</div>
+                    <div class="department-count">1 employee</div>
+                </div>
+                <div class="department-item">
+                    <div class="department-name">Marketing Operations</div>
+                    <div class="department-count">1 employee</div>
+                </div>
+                <div class="department-item">
+                    <div class="department-name">Software Development</div>
+                    <div class="department-count">1 employee</div>
+                </div>
+                <div class="department-item">
+                    <div class="department-name">Storage & Disaster Recovery</div>
+                    <div class="department-count">1 employee</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

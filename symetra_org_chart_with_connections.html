@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symetra Organizational Chart with Reporting Lines</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: auto;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        
+        .org-tree {
+            position: relative;
+            padding: 10px;
+            min-height: 800px;
+        }
+        
+        .level {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 50px;
+            position: relative;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .level::after {
+            content: '';
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 25px;
+            background: #667eea;
+        }
+        
+        .level:last-child::after {
+            display: none;
+        }
+        
+        .employee-node {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 0 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 180px;
+            max-width: 200px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        .employee-node:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            border-color: #4facfe;
+        }
+        
+        .employee-name {
+            font-weight: bold;
+            color: #333;
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+            line-height: 1.1;
+        }
+        
+        .employee-title {
+            color: #666;
+            font-size: 0.65rem;
+            line-height: 1.1;
+            margin-bottom: 2px;
+        }
+        
+        .employee-level {
+            font-size: 0.6rem;
+            color: #999;
+            margin-top: 2px;
+            font-weight: bold;
+        }
+        
+        /* CEO Level */
+        .ceo-level .employee-node {
+            border-color: #dc3545;
+            background: linear-gradient(135deg, #fff5f5, #ffe6e6);
+        }
+        
+        /* C-Suite Level */
+        .c-suite-level .employee-node {
+            border-color: #fd7e14;
+            background: linear-gradient(135deg, #fff8f0, #ffe8d6);
+        }
+        
+        /* Senior VP Level */
+        .senior-vp-level .employee-node {
+            border-color: #ffc107;
+            background: linear-gradient(135deg, #fffdf0, #fff8d6);
+        }
+        
+        /* VP Level */
+        .vp-level .employee-node {
+            border-color: #20c997;
+            background: linear-gradient(135deg, #f0fffd, #d6fff8);
+        }
+        
+        /* Assistant VP Level */
+        .assistant-vp-level .employee-node {
+            border-color: #17a2b8;
+            background: linear-gradient(135deg, #f0f8ff, #d6e8ff);
+        }
+        
+        /* Director Level */
+        .director-level .employee-node {
+            border-color: #6f42c1;
+            background: linear-gradient(135deg, #f8f0ff, #e8d6ff);
+        }
+        
+        /* Senior Manager Level */
+        .senior-manager-level .employee-node {
+            border-color: #fd7e14;
+            background: linear-gradient(135deg, #fff8f0, #ffe8d6);
+        }
+        
+        /* Manager Level */
+        .manager-level .employee-node {
+            border-color: #6c757d;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        }
+        
+        /* Connecting lines */
+        .connection-line {
+            position: absolute;
+            background: #667eea;
+            z-index: -1;
+        }
+        
+        .vertical-line {
+            width: 2px;
+            background: #667eea;
+        }
+        
+        .horizontal-line {
+            height: 2px;
+            background: #667eea;
+        }
+        
+        .summary {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .summary h2 {
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .summary p {
+            color: #6c757d;
+            line-height: 1.4;
+            font-size: 0.9rem;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 2px solid;
+        }
+        
+        @media (max-width: 1200px) {
+            .container {
+                max-width: 95%;
+                padding: 15px;
+            }
+            
+            .employee-node {
+                min-width: 160px;
+                max-width: 180px;
+                padding: 6px 10px;
+            }
+            
+            .employee-name {
+                font-size: 0.75rem;
+            }
+            
+            .employee-title {
+                font-size: 0.6rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .level {
+                flex-direction: column;
+                gap: 10px;
+                margin-bottom: 30px;
+            }
+            
+            .employee-node {
+                margin: 3px 0;
+                min-width: 200px;
+                max-width: 250px;
+            }
+            
+            .legend {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Symetra Organizational Chart with Reporting Lines</h1>
+        
+        <div class="summary">
+            <h2>Complete Reporting Structure</h2>
+            <p>This chart shows the complete hierarchical structure with clear connecting lines indicating who reports to whom. Managers are organized under their respective directors based on job functions and departments.</p>
+        </div>
+        
+        <div class="org-tree">
+            <!-- CEO Level -->
+            <div class="level ceo-level">
+                <div class="employee-node">
+                    <div class="employee-name">Margaret Meister</div>
+                    <div class="employee-title">President and Chief Executive Officer</div>
+                    <div class="employee-level">CEO</div>
+                </div>
+            </div>
+            
+            <!-- C-Suite Level -->
+            <div class="level c-suite-level">
+                <div class="employee-node">
+                    <div class="employee-name">Jamal Bodey-Burks</div>
+                    <div class="employee-title">Chief Information Security Officer</div>
+                    <div class="employee-level">C-Suite</div>
+                </div>
+            </div>
+            
+            <!-- Senior VP Level -->
+            <div class="level senior-vp-level">
+                <div class="employee-node">
+                    <div class="employee-name">Jack Wood</div>
+                    <div class="employee-title">Senior VP (Head of Engineering)</div>
+                    <div class="employee-level">Senior VP</div>
+                </div>
+                <div class="employee-node">
+                    <div class="employee-name">Kevin Rabin</div>
+                    <div class="employee-title">Senior VP, Retirement Products</div>
+                    <div class="employee-level">Senior VP</div>
+                </div>
+                <div class="employee-node">
+                    <div class="employee-name">Chris Lalonde</div>
+                    <div class="employee-title">Senior VP, Life Division</div>
+                    <div class="employee-level">Senior VP</div>
+                </div>
+                <div class="employee-node">
+                    <div class="employee-name">Jay Orum</div>
+                    <div class="employee-title">Senior VP, Information Technology</div>
+                    <div class="employee-level">Senior VP</div>
+                </div>
+                <div class="employee-node">
+                    <div class="employee-name">Andrew Farrell</div>
+                    <div class="employee-title">Senior VP, National Sales</div>
+                    <div class="employee-level">Senior VP</div>
+                </div>
+            </div>
+            
+            <!-- VP Level -->
+            <div class="level vp-level">
+                <div class="employee-node">
+                    <div class="employee-name">Kelley Kelly</div>
+                    <div class="employee-title">Vice President, National Relationship Management</div>
+                    <div class="employee-level">VP</div>
+                </div>
+            </div>
+            
+            <!-- Assistant VP Level -->
+            <div class="level assistant-vp-level">
+                <div class="employee-node">
+                    <div class="employee-name">Chad Ross</div>
+                    <div class="employee-title">Assistant VP, Strategic Solutions</div>
+                    <div class="employee-level">Assistant VP</div>
+                </div>
+                <div class="employee-node">
+                    <div class="employee-name">Derek Reading</div>
+                    <div class="employee-title">Assistant VP, Life Information Technology</div>
+                    <div class="employee-level">Assistant VP</div>
+                </div>
+                <div class="employee-node">
+                    <div class="employee-name">Joelle Conley</div>
+                    <div class="employee-title">Assistant VP, Securities Product Administration</div>
+                    <div class="employee-level">Assistant VP</div>
+                </div>
+                <div class="employee-node">
+                    <div class="employee-name">Sean Cox</div>
+                    <div class="employee-title">Assistant VP, Strategy</div>
+                    <div class="employee-level">Assistant VP</div>
+                </div>
+                <div class="employee-node">
+                    <div class="employee-name">rainya helbraun</div>
+                    <div class="employee-title">Assistant VP, Life Information Technology</div>
+                    <div class="employee-level">Assistant VP</div>
+                </div>
+            </div>
+            
+            <!-- Director Level - Engineering Directors -->
+            <div class="level director-level">
+                <div class="employee-node" data-director="engineering">
+                    <div class="employee-name">Advait Sathe</div>
+                    <div class="employee-title">Director, Engineering</div>
+                    <div class="employee-level">Director</div>
+                </div>
+                <div class="employee-node" data-director="engineering">
+                    <div class="employee-name">Charles Liptaak</div>
+                    <div class="employee-title">Director, Engineering</div>
+                    <div class="employee-level">Director</div>
+                </div>
+                <div class="employee-node" data-director="engineering">
+                    <div class="employee-name">Christian Wilhite</div>
+                    <div class="employee-title">Director, Engineering</div>
+                    <div class="employee-level">Director</div>
+                </div>
+                <div class="employee-node" data-director="engineering">
+                    <div class="employee-name">Kayle Corey</div>
+                    <div class="employee-title">Director, Engineering</div>
+                    <div class="employee-level">Director</div>
+                </div>
+                <div class="employee-node" data-director="engineering">
+                    <div class="employee-name">Mitch Miller</div>
+                    <div class="employee-title">Director, Engineering</div>
+                    <div class="employee-level">Director</div>
+                </div>
+                <div class="employee-node" data-director="engineering">
+                    <div class="employee-name">Priyanka Shahheydari</div>
+                    <div class="employee-title">Director, Engineering</div>
+                    <div class="employee-level">Director</div>
+                </div>
+                <div class="employee-node" data-director="engineering">
+                    <div class="employee-name">Sai Ramanath</div>
+                    <div class="employee-title">Director, Engineering</div>
+                    <div class="employee-level">Director</div>
+                </div>
+            </div>
+            
+            <!-- Director Level - Data & Analytics Directors -->
+            <div class="level director-level">
+                <div class="employee-node" data-director="data">
+                    <div class="employee-name">Charles Sostak</div>
+                    <div class="employee-title">Director, Data Analytics</div>
+                    <div class="employee-level">Director</div>
+                </div>
+                <div class="employee-node" data-director="data">
+                    <div class="employee-name">Chris Kunz</div>
+                    <div class="employee-title">Director, Data Analytics</div>
+                    <div class="employee-level">Director</div>
+                </div>
+            </div>
+            
+            <!-- Director Level - Other Directors -->
+            <div class="level director-level">
+                <div class="employee-node" data-director="other">
+                    <div class="employee-name">Edwin Chong</div>
+                    <div class="employee-title">Director, Contract Automation</div>
+                    <div class="employee-level">Director</div>
+                </div>
+                <div class="employee-node" data-director="other">
+                    <div class="employee-name">Karina Larson</div>
+                    <div class="employee-title">Director, Change Leadership</div>
+                    <div class="employee-level">Director</div>
+                </div>
+                <div class="employee-node" data-director="other">
+                    <div class="employee-name">Kimberly Youngman</div>
+                    <div class="employee-title">Sales Analytics Director</div>
+                    <div class="employee-level">Director</div>
+                </div>
+                <div class="employee-node" data-director="other">
+                    <div class="employee-name">Leah Ihnen</div>
+                    <div class="employee-title">Director, Pfml & Absence</div>
+                    <div class="employee-level">Director</div>
+                </div>
+                <div class="employee-node" data-director="other">
+                    <div class="employee-name">Patricia Williams</div>
+                    <div class="employee-title">Director, IT Risk Management</div>
+                    <div class="employee-level">Director</div>
+                </div>
+                <div class="employee-node" data-director="other">
+                    <div class="employee-name">Phyllis Sweeney</div>
+                    <div class="employee-title">Program Management Director</div>
+                    <div class="employee-level">Director</div>
+                </div>
+                <div class="employee-node" data-director="other">
+                    <div class="employee-name">Sara Gorsuch</div>
+                    <div class="employee-title">Director, Digital Enablement</div>
+                    <div class="employee-level">Director</div>
+                </div>
+            </div>
+            
+            <!-- Senior Manager Level -->
+            <div class="level senior-manager-level">
+                <div class="employee-node">
+                    <div class="employee-name">Janna Bartolina</div>
+                    <div class="employee-title">Senior Manager, Implementation</div>
+                    <div class="employee-level">Senior Manager</div>
+                </div>
+                <div class="employee-node">
+                    <div class="employee-name">Kaley Donnelly</div>
+                    <div class="employee-title">Senior Manager, Information Technology</div>
+                    <div class="employee-level">Senior Manager</div>
+                </div>
+                <div class="employee-node">
+                    <div class="employee-name">Nagu Reddy</div>
+                    <div class="employee-title">Senior Manager, Enterprise Data</div>
+                    <div class="employee-level">Senior Manager</div>
+                </div>
+                <div class="employee-node">
+                    <div class="employee-name">Paul Emmett</div>
+                    <div class="employee-title">Senior Manager, Information Technology</div>
+                    <div class="employee-level">Senior Manager</div>
+                </div>
+                <div class="employee-node">
+                    <div class="employee-name">Whitney Mayoras</div>
+                    <div class="employee-title">Senior Manager, Quality Assurance</div>
+                    <div class="employee-level">Senior Manager</div>
+                </div>
+            </div>
+            
+            <!-- Manager Level - Engineering Managers (report to Engineering Directors) -->
+            <div class="level manager-level">
+                <div class="employee-node" data-reports-to="engineering">
+                    <div class="employee-name">Cory Purkis</div>
+                    <div class="employee-title">Manager, Application Development</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="engineering">
+                    <div class="employee-name">Gary Nelson</div>
+                    <div class="employee-title">Manager, Application</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="engineering">
+                    <div class="employee-name">Jongson Kim</div>
+                    <div class="employee-title">Manager, Application Development</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="engineering">
+                    <div class="employee-name">Merritt Chapman</div>
+                    <div class="employee-title">Manager, Software Development</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="engineering">
+                    <div class="employee-name">Peter Horsley</div>
+                    <div class="employee-title">Manager, Applications Development</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="engineering">
+                    <div class="employee-name">Sarah Sparks</div>
+                    <div class="employee-title">Manager, Application Development</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="engineering">
+                    <div class="employee-name">Timothy Gihring</div>
+                    <div class="employee-title">Manager, Application</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+            </div>
+            
+            <!-- Manager Level - IT Managers (report to IT Directors) -->
+            <div class="level manager-level">
+                <div class="employee-node" data-reports-to="it">
+                    <div class="employee-name">Albert Teng</div>
+                    <div class="employee-title">Manager, Information Technology</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="it">
+                    <div class="employee-name">Brad Naybert</div>
+                    <div class="employee-title">Manager, IT Operations</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="it">
+                    <div class="employee-name">Cetchren Nealy</div>
+                    <div class="employee-title">Senior Project Manager, IT Security</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="it">
+                    <div class="employee-name">David Farahani</div>
+                    <div class="employee-title">Senior Project Manager, IT</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="it">
+                    <div class="employee-name">Dax Ewbank</div>
+                    <div class="employee-title">IT Operations Manager</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="it">
+                    <div class="employee-name">Deva Sharma</div>
+                    <div class="employee-title">Manager, Information Technology Risk</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="it">
+                    <div class="employee-name">Diane Lenox</div>
+                    <div class="employee-title">Senior Technical Program Manager</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="it">
+                    <div class="employee-name">Jeremy McKenzie</div>
+                    <div class="employee-title">Senior Technical Program Manager</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="it">
+                    <div class="employee-name">Kitty Ng</div>
+                    <div class="employee-title">Project Manager, Information Technology</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="it">
+                    <div class="employee-name">Lisa Pisoni</div>
+                    <div class="employee-title">Manager, IT Vendor Security</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="it">
+                    <div class="employee-name">Melissa Ambrose</div>
+                    <div class="employee-title">Project Manager, Information Technology</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="it">
+                    <div class="employee-name">Phi Tieskoetter</div>
+                    <div class="employee-title">Senior Category Manager, IT</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="it">
+                    <div class="employee-name">Ravi Pydi</div>
+                    <div class="employee-title">Manager, Information Technology Operations</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="it">
+                    <div class="employee-name">Terrasa Crawford</div>
+                    <div class="employee-title">Senior Program Manager, IT</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="it">
+                    <div class="employee-name">Vengatesan Sidheswaran</div>
+                    <div class="employee-title">Senior Technical Program Manager</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+            </div>
+            
+            <!-- Manager Level - Implementation/Business Managers -->
+            <div class="level manager-level">
+                <div class="employee-node" data-reports-to="implementation">
+                    <div class="employee-name">Angela McAuley</div>
+                    <div class="employee-title">Manager, Claims Implementation</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="implementation">
+                    <div class="employee-name">Carleigh Brown</div>
+                    <div class="employee-title">Regional Manager, Implementation</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="implementation">
+                    <div class="employee-name">Janessa Marti</div>
+                    <div class="employee-title">Manager, Implementation</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="implementation">
+                    <div class="employee-name">Mary Souriyavongsa</div>
+                    <div class="employee-title">Implementation Associate & Manager</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="implementation">
+                    <div class="employee-name">Peachy Kent</div>
+                    <div class="employee-title">Manager, Implementation</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="implementation">
+                    <div class="employee-name">Ryan Bagley</div>
+                    <div class="employee-title">Manager, Implementation</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+            </div>
+            
+            <!-- Manager Level - Other Managers -->
+            <div class="level manager-level">
+                <div class="employee-node" data-reports-to="other">
+                    <div class="employee-name">Chris Anderson</div>
+                    <div class="employee-title">Senior Program Manager, BI</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="other">
+                    <div class="employee-name">Christina Mitchell</div>
+                    <div class="employee-title">Manager, Benefits Implementation</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="other">
+                    <div class="employee-name">Ketaki Dingre</div>
+                    <div class="employee-title">Manager, Business Case</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="other">
+                    <div class="employee-name">Peggy Yeager</div>
+                    <div class="employee-title">Division Manager, Retirement Sales</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="other">
+                    <div class="employee-name">Rakhi Mandadi</div>
+                    <div class="employee-title">Principal Technical Program Manager</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="other">
+                    <div class="employee-name">Veronica Simauw</div>
+                    <div class="employee-title">Program Manager, Business Continuity</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+                <div class="employee-node" data-reports-to="other">
+                    <div class="employee-name">Victor Fiore</div>
+                    <div class="employee-title">Manager, Incident</div>
+                    <div class="employee-level">Manager</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="border-color: #dc3545; background: linear-gradient(135deg, #fff5f5, #ffe6e6);"></div>
+                <span>CEO</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="border-color: #fd7e14; background: linear-gradient(135deg, #fff8f0, #ffe8d6);"></div>
+                <span>C-Suite</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="border-color: #ffc107; background: linear-gradient(135deg, #fffdf0, #fff8d6);"></div>
+                <span>Senior VP</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="border-color: #20c997; background: linear-gradient(135deg, #f0fffd, #d6fff8);"></div>
+                <span>VP</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="border-color: #17a2b8; background: linear-gradient(135deg, #f0f8ff, #d6e8ff);"></div>
+                <span>Assistant VP</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="border-color: #6f42c1; background: linear-gradient(135deg, #f8f0ff, #e8d6ff);"></div>
+                <span>Director</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="border-color: #fd7e14; background: linear-gradient(135deg, #fff8f0, #ffe8d6);"></div>
+                <span>Senior Manager</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="border-color: #6c757d; background: linear-gradient(135deg, #f8f9fa, #e9ecef);"></div>
+                <span>Manager</span>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Add connecting lines showing reporting relationships
+        function addConnectingLines() {
+            const levels = document.querySelectorAll('.level');
+            
+            levels.forEach((level, index) => {
+                if (index < levels.length - 1) {
+                    const currentLevel = level;
+                    const nextLevel = levels[index + 1];
+                    
+                    // CEO to CISO
+                    if (index === 0) {
+                        const ceo = currentLevel.querySelector('.employee-node');
+                        const ciso = nextLevel.querySelector('.employee-node');
+                        addConnectionLine(ceo, ciso, 'vertical');
+                    }
+                    // CISO to Senior VPs
+                    else if (index === 1) {
+                        const ciso = currentLevel.querySelector('.employee-node');
+                        const seniorVPs = nextLevel.querySelectorAll('.employee-node');
+                        seniorVPs.forEach(svp => {
+                            addConnectionLine(ciso, svp, 'vertical');
+                        });
+                    }
+                    // Senior VPs to VP (Andrew Farrell to Kelley Kelly)
+                    else if (index === 2) {
+                        const andrewFarrell = currentLevel.querySelectorAll('.employee-node')[4]; // National Sales
+                        const kelleyKelly = nextLevel.querySelector('.employee-node');
+                        addConnectionLine(andrewFarrell, kelleyKelly, 'vertical');
+                    }
+                    // VP to Assistant VPs
+                    else if (index === 3) {
+                        const kelleyKelly = currentLevel.querySelector('.employee-node');
+                        const assistantVPs = nextLevel.querySelectorAll('.employee-node');
+                        assistantVPs.forEach(avp => {
+                            addConnectionLine(kelleyKelly, avp, 'vertical');
+                        });
+                    }
+                    // Assistant VPs to Directors
+                    else if (index === 4) {
+                        const derekReading = currentLevel.querySelectorAll('.employee-node')[1]; // Life IT
+                        const joelleConley = currentLevel.querySelectorAll('.employee-node')[2]; // Securities
+                        
+                        // Connect to engineering directors
+                        const engineeringDirectors = nextLevel.querySelectorAll('[data-director="engineering"]');
+                        engineeringDirectors.forEach(director => {
+                            addConnectionLine(derekReading, director, 'vertical');
+                        });
+                        
+                        // Connect to data directors
+                        const dataDirectors = nextLevel.querySelectorAll('[data-director="data"]');
+                        dataDirectors.forEach(director => {
+                            addConnectionLine(derekReading, director, 'vertical');
+                        });
+                    }
+                    // Directors to Senior Managers
+                    else if (index === 5 || index === 6) {
+                        const directors = currentLevel.querySelectorAll('.employee-node');
+                        const seniorManagers = nextLevel.querySelectorAll('.employee-node');
+                        
+                        directors.forEach((director, dirIndex) => {
+                            if (seniorManagers[dirIndex]) {
+                                addConnectionLine(director, seniorManagers[dirIndex], 'vertical');
+                            }
+                        });
+                    }
+                    // Senior Managers to Managers
+                    else if (index === 7) {
+                        const seniorManagers = currentLevel.querySelectorAll('.employee-node');
+                        const managerGroups = nextLevel.querySelectorAll('.level');
+                        
+                        // Connect IT Senior Managers to IT Managers
+                        const kaleyDonnelly = seniorManagers[1]; // IT Senior Manager
+                        const paulEmmett = seniorManagers[3]; // IT Senior Manager
+                        
+                        const itManagers = managerGroups[1].querySelectorAll('[data-reports-to="it"]');
+                        itManagers.forEach(manager => {
+                            addConnectionLine(kaleyDonnelly, manager, 'vertical');
+                        });
+                        
+                        // Connect Implementation Senior Manager to Implementation Managers
+                        const jannaBartolina = seniorManagers[0]; // Implementation Senior Manager
+                        const implementationManagers = managerGroups[2].querySelectorAll('[data-reports-to="implementation"]');
+                        implementationManagers.forEach(manager => {
+                            addConnectionLine(jannaBartolina, manager, 'vertical');
+                        });
+                        
+                        // Connect Engineering Directors to Engineering Managers
+                        const engineeringManagers = managerGroups[0].querySelectorAll('[data-reports-to="engineering"]');
+                        engineeringManagers.forEach(manager => {
+                            addConnectionLine(seniorManagers[0], manager, 'vertical');
+                        });
+                    }
+                }
+            });
+        }
+        
+        function addConnectionLine(fromElement, toElement, type) {
+            const line = document.createElement('div');
+            line.className = `connection-line ${type}-line`;
+            line.style.position = 'absolute';
+            line.style.left = '50%';
+            line.style.transform = 'translateX(-50%)';
+            line.style.top = '100%';
+            line.style.height = '25px';
+            line.style.zIndex = '-1';
+            line.style.background = '#667eea';
+            line.style.width = '2px';
+            
+            fromElement.style.position = 'relative';
+            fromElement.appendChild(line);
+        }
+        
+        // Initialize connecting lines when page loads
+        window.addEventListener('load', addConnectingLines);
+    </script>
+</body>
+</html> 
